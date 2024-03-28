@@ -1,29 +1,9 @@
-type AnyObjectT = {
-  [key: string]: any;
-};
-
-type AnyObjectOrT<ObjectT> =
-  | ObjectT
-  | {
-      [key: string]: any;
-    };
-
-type AnyObjectOrNullT = AnyObjectT | null;
-type AnyObjectOrNullOrT<ObjectT> = AnyObjectOrT<ObjectT> | null;
-
-type AnyFunctionT = (...args: any[]) => any;
-
-type PartialFolderT = {
-  name: string;
-  localPath: string;
-};
-
-type DBSettingsT = {
+export type DBSettingsT = {
   language: string;
   darkMode: boolean;
 };
 
-type DBFolderT = {
+export type DBFolderT = {
   id: string;
   name: string;
   originalIndexDate: number;
@@ -39,17 +19,17 @@ type DBFolderT = {
   shouldIndexRecurisvely: boolean;
 };
 
-type DBCollectionT = {
+export type DBCollectionT = {
   id: string;
   name: string;
   description: string;
-  assetIds: string[];
+  assetIds: number[];
   createdDate: number;
   updatedDate: number;
   artworkUrl: string;
 };
 
-type DBAssetT = {
+export type DBAssetT = {
   id: string;
   name: string;
   size: number;

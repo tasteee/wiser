@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Flex, Text, Button, Heading } from '@radix-ui/themes';
-import { Link } from 'wouter';
+import { Link } from '../../components/Link';
 
 export const SideBar = (props) => {
   return (
@@ -15,10 +15,10 @@ export const SideBar = (props) => {
       height="100%"
     >
       <SideBarSection title="">
-        <Link to="/">
+        <Link styling="sideBarMain" to="/">
           <Text>Search</Text>
         </Link>
-        <Link to="/collections">
+        <Link styling="sideBarMain" to="/collections">
           <Text>Collections</Text>
         </Link>
       </SideBarSection>
@@ -33,7 +33,7 @@ export const SideBar = (props) => {
       <div style={{ height: '100%' }}> </div>
 
       <SideBarSection title="">
-        <Link to="/settings">
+        <Link styling="sideBarSub" to="/settings">
           <Text>Settings</Text>
         </Link>
       </SideBarSection>

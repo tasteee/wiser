@@ -1,4 +1,9 @@
 import * as React from 'react';
+import { TableIcon, TrashIcon } from '@radix-ui/react-icons';
+import { Spacer } from '../components/Spacer';
+import { useSettings } from '../contexts/settings';
+import { ViewContainer } from '../components/ViewContainer';
+
 import {
   Card,
   Avatar,
@@ -8,10 +13,6 @@ import {
   Button,
   Heading,
 } from '@radix-ui/themes';
-import { TableIcon, TrashIcon } from '@radix-ui/react-icons';
-import { Spacer } from '../components/Spacer';
-import { useSettings } from '../contexts/settings';
-import { ViewContainer } from '../components/ViewContainer';
 
 export const Settings = () => {
   return (
@@ -39,12 +40,12 @@ const SettingsSection = (props) => {
 const FoldersSection = () => {
   const settings = useSettings();
 
+  console.log({ settings });
   const foldersList = (
     <Flex direction="column" py="2" gap="3">
-      {settings.folders.map((path: string) => {
-        const lastSlashIndex = path.lastIndexOf('/');
-        const name = path.substring(lastSlashIndex);
-        return <FolderListItem key={path} name={name} path={path} />;
+      {settings.folders.map((folder) => {
+        console.log('LP:', folder.localPath);
+        return <FolderListItem key={folder.id} {...folder} />;
       })}
     </Flex>
   );
@@ -58,16 +59,11 @@ const FoldersSection = () => {
   );
 };
 
-type FolderListItemPropsT = {
-  path: string;
-  name: string;
-};
-
-const FolderListItem = (props: FolderListItemPropsT) => {
+const FolderListItem = (props) => {
   const settings = useSettings();
 
   const removeFolder = () => {
-    settings.removeFolder(props.path);
+    settings.removeFolder(props);
   };
 
   return (
@@ -78,13 +74,15 @@ const FolderListItem = (props: FolderListItemPropsT) => {
         </Flex>
         <Flex direction="column" width="100%">
           <Heading size="3">{props.name}</Heading>
-          <Text>{props.path}</Text>
+          <Text>{props.localPath}</Text>
         </Flex>
         <Flex align="start">
-          <Button size="2" variant="solid" onClick={removeFolder}>
-            {/* <Cross2Icon /> */}
-            <TrashIcon />
-          </Button>
+          {'id' in props && (
+            <Button size="2" variant="solid" onClick={removeFolder}>
+              {/* <Cross2Icon /> */}
+              <TrashIcon />
+            </Button>
+          )}
         </Flex>
       </Flex>
     </Card>
@@ -101,11 +99,14 @@ const FolderSelector = () => {
     const filePath: string = firstFile.path;
     const cleanedPath = filePath.replace(/(\\)(||)/g, '/');
     const lastSlashIndex = cleanedPath.lastIndexOf('/');
-    const folderPath = cleanedPath.substring(0, lastSlashIndex);
-    settings.addFolder(folderPath);
+    const localPath = cleanedPath.substring(0, lastSlashIndex);
+    const newLastSlashIndex = localPath.lastIndexOf('/');
+    const folderName = localPath.substring(newLastSlashIndex + 1);
+    settings.addFolder({ name: folderName, localPath });
   };
 
-  const clickInput = () => {
+  const clickInput = (event) => {
+    event.preventDefault();
     inputRef.current.click();
   };
 

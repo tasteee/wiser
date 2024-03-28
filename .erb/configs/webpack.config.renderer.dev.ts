@@ -39,6 +39,10 @@ if (
 }
 
 const configuration: webpack.Configuration = {
+  watchOptions: {
+    ignored: /\*.json/,
+  },
+
   devtool: 'inline-source-map',
 
   mode: 'development',

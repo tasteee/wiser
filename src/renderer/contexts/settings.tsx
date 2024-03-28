@@ -1,30 +1,53 @@
 import * as React from 'react';
 import { createContextHook } from '../utilities/createContextHook';
-import { togglePrimitiveItemInArray } from '../utilities/array';
+import { services } from '../services';
+import { DBFolderT } from '../services/databaseTypes';
+
+type PartialOrFullFolderT = PartialFolderT | DBFolderT;
+type FolderListT = Array<PartialOrFullFolderT>;
 
 type SettingsContextT = {
-  folders: string[];
-  addFolder: (path: string) => void;
-  removeFolder: (path: string) => void;
+  settings: DBSettingsT | undefined;
+  folders: FolderListT;
+  addFolder: (folder: PartialFolderT) => void;
+  removeFolder: (folder: DBFolderT) => void;
 };
 
 const contextCreator = (): SettingsContextT => {
-  const [folders, setFolders] = React.useState<string[]>([]);
+  const [settings, setSettings] = React.useState<DBSettingsT | undefined>();
+  const [folders, setFolders] = React.useState<FolderListT>([]);
 
-  const addFolder = (path: string) => {
-    setFolders([...folders, path]);
+  React.useEffect(() => {
+    try {
+      services.settings.get().json(setSettings);
+      services.folders.get().json(setFolders);
+    } catch (error) {
+      console.log('Error at settings.get or folders.get', error);
+    }
+  }, []);
+
+  const addFolder = async (folder: PartialFolderT) => {
+    try {
+      const response = await services.folders.add(folder);
+      const updatedFolders = await response.json();
+      setFolders(updatedFolders as DBFolderT[]);
+    } catch (error) {
+      console.log({ ERROR: error });
+    }
   };
 
-  const removeFolder = (path: string) => {
-    const updatedFolders = togglePrimitiveItemInArray({
-      target: folders,
-      item: path,
-    });
-
-    setFolders(updatedFolders);
+  const removeFolder = async (folder: DBFolderT) => {
+    try {
+      const response = await services.folders.remove(folder.id);
+      const updatedFolders = await response.json();
+      setFolders(updatedFolders as DBFolderT[]);
+    } catch (error) {
+      console.log({ ERROR: error });
+    }
   };
 
   return {
+    settings,
     folders,
     addFolder,
     removeFolder,

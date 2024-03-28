@@ -7,6 +7,7 @@ import {
   Heading,
   Button,
   TextField,
+  Separator,
 } from '@radix-ui/themes';
 import { useSearch } from '../../contexts/search';
 import {
@@ -17,6 +18,7 @@ import {
 } from './Fiilters';
 import { ViewContainer } from '../../components/ViewContainer';
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { Asset } from './Asset';
 
 export const Search = () => {
   const search = useSearch();
@@ -31,6 +33,16 @@ export const Search = () => {
           <BPMSelector />
           <Button>Search</Button>
         </Flex>
+      </Flex>
+      <Separator my="3" size="4" />
+      <Flex direction="column" gap="2">
+        <Asset />
+        <Asset />
+        <Asset />
+        <Asset />
+        <Asset />
+        <Asset />
+        <Asset />
       </Flex>
     </ViewContainer>
   );

@@ -1,0 +1,61 @@
+{
+  "settings": {
+    "language": "english",
+    "darkMode": true
+  },
+  "folders": [
+    {
+      "isIndexingComplete": false,
+      "isAwaitingIndexing": true,
+      "isIndexing": false,
+      "shouldIndexRecurisvely": true,
+      "albumArtworkSrc": "https://i.imgur.com/Jgv9KEb.png",
+      "midiFileCount": 0,
+      "audioFileCount": 0,
+      "assetCount": 0,
+      "originalIndexDate": 1711614056531,
+      "updatedIndexDate": 1711614056531,
+      "name": "testSamplesFolder",
+      "localPath": "C:/Users/hannah/Desktop/sandbox/testSamplesFolder",
+      "id": "ycopGYEw05_WcH7dcSOfv"
+    }
+  ],
+  "collections": [
+    {
+      "id": "12345",
+      "name": "best kicks",
+      "description": "my favorite kicks ever",
+      "assets": [
+        12345,
+        54321,
+        12321,
+        65454,
+        18394
+      ],
+      "createdDate": 12345,
+      "updatedDate": 12345,
+      "artworkPath": "C:/foo/bar/baz.png"
+    }
+  ],
+  "assets": [
+    {
+      "id": 54321,
+      "name": "foo.mp3",
+      "size": 12345,
+      "length": 12345,
+      "path": "C:/foo/bar/baz/Best Sample Pack/foo.mp3",
+      "type": "audio",
+      "subType": "mp3",
+      "indexedDate": 12345,
+      "tags": [
+        "drums",
+        "kick",
+        "wet",
+        "fat",
+        "pop"
+      ],
+      "isFavorited": true,
+      "indexedFolderId": 54321
+    }
+  ]
+}

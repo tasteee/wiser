@@ -1,9 +1,13 @@
 type TargetAndItemT = { target: any[]; item: any };
 
-type TargetItemAndUniqueKeyT = {
+type TargetAndKeyValueMatchT = {
   target: any[];
-  item: AnyObjectT;
-  uniqueKey: string;
+  matchValue: any;
+  matchKey: string;
+};
+
+type ToggleInputT = TargetAndKeyValueMatchT & {
+  item: any;
 };
 
 export const removeItemFromArray = (input: TargetAndItemT) => {
@@ -12,9 +16,9 @@ export const removeItemFromArray = (input: TargetAndItemT) => {
   });
 };
 
-export const removeObjectItemFromArray = (input: TargetItemAndUniqueKeyT) => {
+export const removeObjectItemFromArray = (input: TargetAndKeyValueMatchT) => {
   return input.target.filter((item) => {
-    return item[input.uniqueKey] !== input.item[input.uniqueKey];
+    return item[input.matchKey] !== input.matchValue;
   });
 };
 
@@ -26,9 +30,9 @@ export const togglePrimitiveItemInArray = (input: TargetAndItemT) => {
     : [...input.target, input.item];
 };
 
-export const toggleObjectItemInArray = (input: TargetItemAndUniqueKeyT) => {
+export const toggleObjectItemInArray = (input: ToggleInputT) => {
   const itemIndex = input.target.findIndex((item, index) => {
-    return item[input.uniqueKey] === input.item[input.uniqueKey];
+    return item[input.matchKey] === input.matchValue;
   });
 
   const isItemPresent = itemIndex >= 0;

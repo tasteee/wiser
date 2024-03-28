@@ -1,19 +1,10 @@
-/* eslint global-require: off, no-console: off, promise/always-return: off */
-
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `npm run build` or `npm run build:main`, this file is compiled to
- * `./src/main.js` using webpack. This gives us some performance wins.
- */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { spawn } from 'child_process';
 
 class AppUpdater {
   constructor() {
@@ -105,6 +96,21 @@ const createWindow = async () => {
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
+  });
+
+  console.log('\n\n\n', __dirname, ' ----- ', __dirname + '/server', '\n\n\n');
+
+  // qqqqq
+  const serverProcess = spawn('node', ['index.mjs'], {
+    cwd: __dirname + '/server',
+  });
+
+  serverProcess.stdout.on('data', (data) => {
+    console.log(`Server stdout: ${data}`);
+  });
+
+  serverProcess.stderr.on('data', (data) => {
+    console.error(`Server stderr: ${data}`);
   });
 
   // Remove this if your app does not use auto updates
