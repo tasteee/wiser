@@ -2,13 +2,17 @@ import wretch from 'wretch';
 
 const server = wretch('http://127.0.0.1:64426');
 
-export const getSettings = () => {
+const startup = () => {
+  return server.get('/startup');
+};
+
+const getSettings = () => {
   return server.get('/settings');
 };
 
 const updateSettings = async (updates: any) => {};
 
-export const getFolders = () => {
+const getFolders = () => {
   return server.get('/folders');
 };
 
@@ -21,6 +25,8 @@ const removeFolder = (id: string) => {
 };
 
 export const services = {
+  startup,
+
   settings: {
     get: getSettings,
     update: updateSettings,

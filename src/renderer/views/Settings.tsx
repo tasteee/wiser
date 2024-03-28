@@ -1,18 +1,10 @@
-import * as React from 'react';
-import { TableIcon, TrashIcon } from '@radix-ui/react-icons';
-import { Spacer } from '../components/Spacer';
-import { useSettings } from '../contexts/settings';
-import { ViewContainer } from '../components/ViewContainer';
+import * as React from "react"
+import { TableIcon, TrashIcon } from "@radix-ui/react-icons"
+import { Spacer } from "../components/Spacer"
+import { useSettings } from "../contexts/settings"
+import { ViewContainer } from "../components/ViewContainer"
 
-import {
-  Card,
-  Avatar,
-  Box,
-  Flex,
-  Text,
-  Button,
-  Heading,
-} from '@radix-ui/themes';
+import { Card, Avatar, Box, Flex, Text, Button, Heading, Badge } from "@radix-ui/themes"
 
 export const Settings = () => {
   return (
@@ -25,8 +17,8 @@ export const Settings = () => {
         <FoldersSection />
       </Flex>
     </ViewContainer>
-  );
-};
+  )
+}
 
 const SettingsSection = (props) => {
   return (
@@ -34,21 +26,21 @@ const SettingsSection = (props) => {
       <Heading size="4">{props.title}</Heading>
       {props.children}
     </Flex>
-  );
-};
+  )
+}
 
 const FoldersSection = () => {
-  const settings = useSettings();
+  const settings = useSettings()
 
-  console.log({ settings });
+  console.log({ settings })
   const foldersList = (
     <Flex direction="column" py="2" gap="3">
       {settings.folders.map((folder) => {
-        console.log('LP:', folder.localPath);
-        return <FolderListItem key={folder.id} {...folder} />;
+        console.log("LP:", folder.localPath)
+        return <FolderListItem key={folder.id} {...folder} />
       })}
     </Flex>
-  );
+  )
 
   return (
     <SettingsSection title="Indexed Folders">
@@ -56,15 +48,21 @@ const FoldersSection = () => {
       {settings.folders.length > 0 ? foldersList : null}
       <FolderSelector />
     </SettingsSection>
-  );
-};
+  )
+}
+
+const FolderIndexingStatus = (props) => {
+  if (!!props.isIndexingComplete) return <Badge color="green">Index Complete</Badge>
+  if (!!props.isIndexing) return <Badge color="blue">Currently Indexing</Badge>
+  return <Badge color="orange">Awaiting Indexing</Badge>
+}
 
 const FolderListItem = (props) => {
-  const settings = useSettings();
+  const settings = useSettings()
 
   const removeFolder = () => {
-    settings.removeFolder(props);
-  };
+    settings.removeFolder(props)
+  }
 
   return (
     <Card>
@@ -75,9 +73,12 @@ const FolderListItem = (props) => {
         <Flex direction="column" width="100%">
           <Heading size="3">{props.name}</Heading>
           <Text>{props.localPath}</Text>
+          <Flex gap="2" mt="2">
+            <FolderIndexingStatus {...props} />
+          </Flex>
         </Flex>
         <Flex align="start">
-          {'id' in props && (
+          {"id" in props && (
             <Button size="2" variant="solid" onClick={removeFolder}>
               {/* <Cross2Icon /> */}
               <TrashIcon />
@@ -86,29 +87,29 @@ const FolderListItem = (props) => {
         </Flex>
       </Flex>
     </Card>
-  );
-};
+  )
+}
 
 const FolderSelector = () => {
-  const settings = useSettings();
-  const inputRef = React.useRef();
+  const settings = useSettings()
+  const inputRef = React.useRef()
 
   const handleFolderSelect = (event: any) => {
-    const files = event.target.files;
-    const firstFile = files[0];
-    const filePath: string = firstFile.path;
-    const cleanedPath = filePath.replace(/(\\)(||)/g, '/');
-    const lastSlashIndex = cleanedPath.lastIndexOf('/');
-    const localPath = cleanedPath.substring(0, lastSlashIndex);
-    const newLastSlashIndex = localPath.lastIndexOf('/');
-    const folderName = localPath.substring(newLastSlashIndex + 1);
-    settings.addFolder({ name: folderName, localPath });
-  };
+    const files = event.target.files
+    const firstFile = files[0]
+    const filePath: string = firstFile.path
+    const cleanedPath = filePath.replace(/\\/g, "/")
+    const lastSlashIndex = cleanedPath.lastIndexOf("/")
+    const localPath = cleanedPath.substring(0, lastSlashIndex)
+    const newLastSlashIndex = localPath.lastIndexOf("/")
+    const folderName = localPath.substring(newLastSlashIndex + 1)
+    settings.addFolder({ name: folderName, localPath })
+  }
 
   const clickInput = (event) => {
-    event.preventDefault();
-    inputRef.current.click();
-  };
+    event.preventDefault()
+    inputRef.current.click()
+  }
 
   return (
     <Flex>
@@ -117,7 +118,7 @@ const FolderSelector = () => {
       </label>
       <input
         ref={inputRef}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         id="folderSelector"
         type="file"
         directory=""
@@ -125,5 +126,5 @@ const FolderSelector = () => {
         onChange={handleFolderSelect}
       />
     </Flex>
-  );
-};
+  )
+}

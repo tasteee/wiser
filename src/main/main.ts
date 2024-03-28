@@ -98,19 +98,30 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
-  console.log('\n\n\n', __dirname, ' ----- ', __dirname + '/server', '\n\n\n');
-
-  // qqqqq
+  // Start cutsom server.
   const serverProcess = spawn('node', ['index.mjs'], {
     cwd: __dirname + '/server',
   });
 
   serverProcess.stdout.on('data', (data) => {
-    console.log(`Server stdout: ${data}`);
+    console.log('serverProcess data:', data.toString());
   });
 
   serverProcess.stderr.on('data', (data) => {
-    console.error(`Server stderr: ${data}`);
+    console.log('serverProcess error:', data.toString());
+  });
+
+  // Start cutsom socket.
+  const socketProcess = spawn('node', ['socketServer.mjs'], {
+    cwd: __dirname + '/server',
+  });
+
+  socketProcess.stdout.on('data', (data) => {
+    console.log('socketProcess data:', data.toString());
+  });
+
+  socketProcess.stderr.on('data', (data) => {
+    console.error('socketProcess error: ', data.toString());
   });
 
   // Remove this if your app does not use auto updates

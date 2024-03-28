@@ -19,6 +19,6 @@ const addFolderToDatabase = async (folderPath) => {
 
 const startIndexingAssets = () => {};
 
-addFolderToDatabase(
-  'C:/Users/hannah/Music/Asset Packs/POP_PIANO/FLPP_WAV_LOOPS/FLPP_120/FLPP_120_BM',
-);
+// addFolderToDatabase(
+//   'C:/Users/hannah/Music/Asset Packs/POP_PIANO/FLPP_WAV_LOOPS/FLPP_120/FLPP_120_BM',
+// );

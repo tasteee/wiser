@@ -1,25 +1,55 @@
-// const { database, getSettings } = require('./scripts/database');
 // import { dbFolders } from './scripts/database.mjs';
-// import { JSONFilePreset } from 'lowdb/node';
-// import databaseTemplate from './scripts/databaseTemplate.json' assert { type: 'json' };
-import { dbFolders } from './scripts/database.mjs';
+import { indexFolders } from "./actions/indexFolders.mjs"
+import * as dbFolders from "./database/folders/index.mjs"
+import { sendMessage } from "./socket.mjs"
 
-export const get = async (req, res) => {
-  console.log('\nGET /folders\n');
-  const folders = await dbFolders.get();
-  console.log('----------- ', folders);
-  res.json(folders);
-};
+export const getAll = async (req, res) => {
+  console.log("GET /folders")
+  const result = await dbFolders.getAll()
+
+  console.log({ result })
+  if (result.didError) {
+    return res.json({ error: "dbFolders.getAll" })
+  }
+
+  console.log("found ", result.data.length, " folders")
+  res.json(result.data)
+}
+
+export const getById = async (req, res) => {
+  console.log("GET /folders", req.params.id)
+  const result = await dbFolders.getById(req.params.id)
+
+  if (result.didError) {
+    return res.json({ error: "dbFolders.getById" })
+  }
+
+  res.json(result.data)
+}
 
 export const add = async (req, res) => {
-  console.log('\nPUT /folders\n', req.body);
-  const folders = await dbFolders.add(req.body);
-  console.log('----------- ', folders);
-  res.json(folders);
-};
+  console.log("PUT /folders", req.body)
+  const createResult = await dbFolders.create(req.body)
+  const allFoldersResult = await dbFolders.getAll()
+  res.json(allFoldersResult.data)
+
+  await indexFolders()
+  const newAllFoldersResult = await dbFolders.getAll()
+
+  sendMessage({
+    messageType: "foldersUpdate",
+    folders: newAllFoldersResult.data,
+  })
+}
 
 export const remove = async (req, res) => {
-  console.log('\nDELETE /folders\n', req.params.id);
-  const folders = await dbFolders.remove(req.params.id);
-  res.json(folders);
-};
+  console.log("DELETE /folders", req.params.id)
+  const result = await dbFolders.removeById(req.params.id)
+
+  console.log("remove result", result)
+  console.log("and data", result.data)
+
+  const allFoldersResult = await dbFolders.getAll()
+
+  res.json(allFoldersResult.data)
+}

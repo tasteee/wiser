@@ -8,6 +8,10 @@ import { nanoid } from 'nanoid';
 
 export const database = JSONFilePreset('wiserDatabase.json', databaseTemplate);
 
+const getDatabase = () => {
+  return JSONFilePreset('wiserDatabase.json', databaseTemplate);
+};
+
 // basic
 // utility
 // functions
@@ -30,7 +34,7 @@ export const checkArrayObjectsForKeyValue = (options) => {
 
 // addDatabaseItem({ databaseKey: 'assets', item: { name: 'foo' }})
 export const addDatabaseItem = async (options) => {
-  const db = await database;
+  const db = await getDatabase();
 
   await db.update((data) => {
     const target = data[options.databaseKey];
@@ -42,7 +46,7 @@ export const addDatabaseItem = async (options) => {
 
 // deleteDatabaseItem({ databaseKey: "collections", id: 12345 })
 export const deleteDatabaseItem = async (options) => {
-  const db = await database;
+  const db = await getDatabase();
 
   await db.update((data) => {
     const target = data[options.databaseKey];
@@ -55,7 +59,7 @@ export const deleteDatabaseItem = async (options) => {
 
 // updateDatabaseItem({ databaseKey: 'assets', id: 12345, applyChanges: () => {} })
 export const updateDatabaseItem = async (options) => {
-  const db = await database;
+  const db = await getDatabase();
 
   await db.update((data) => {
     const target = data[options.databaseKey];
@@ -216,7 +220,7 @@ export const toggleAssetFavorited = async (id) => {
 // Check to see if any folders are not done indexing.
 // Returns an array of all folders that need to be indexed.
 export const checkForIndexingJobs = async () => {
-  const db = await database;
+  const db = await getDatabase();
   const folders = db.data.folders;
 
   const pendingFolders = folders.reduce((list, folder) => {
@@ -230,16 +234,16 @@ export const checkForIndexingJobs = async () => {
 // Checks if an asset matching the given filePath
 // has or has not been indexed yet.
 export const checkIfAssetIsIndexed = async (filePath) => {
-  const db = await database;
+  const db = await getDatabase();
   const assets = db.data.assets;
 
-  const isFileIndexed = checkArrayObjectsForKeyValue({
-    target: assets,
-    key: 'path',
-    value: filePath,
-  });
+  for (const asset of assets) {
+    if (asset.localPath === filePath) {
+      return asset;
+    }
+  }
 
-  return isFileIndexed;
+  return false;
 };
 
 // settings
@@ -248,7 +252,7 @@ export const checkIfAssetIsIndexed = async (filePath) => {
 
 export const dbFolders = (() => {
   const get = async () => {
-    const db = await database;
+    const db = await getDatabase();
     return db.data.folders;
   };
 
@@ -258,7 +262,7 @@ export const dbFolders = (() => {
       id,
     });
 
-    const db = await database;
+    const db = await getDatabase();
     return db.data.folders;
   };
 
@@ -297,7 +301,23 @@ export const dbFolders = (() => {
       item: updatedFolder,
     });
 
-    const db = await database;
+    const db = await getDatabase();
+    return db.data.folders;
+  };
+
+  const update = async (options) => {
+    console.log('UPDATING folder ', options.name, ' with data', options);
+    const applyChanges = (item) => {
+      return Object.apply(item, options);
+    };
+
+    await updateDatabaseItem({
+      databaseKey: 'folders',
+      id: options.id,
+      applyChanges,
+    });
+
+    const db = await getDatabase();
     return db.data.folders;
   };
 
@@ -305,17 +325,18 @@ export const dbFolders = (() => {
     get,
     remove,
     add,
+    update,
   };
 })();
 
 export const dbSettings = (() => {
   const get = async () => {
-    const db = await database;
+    const db = await getDatabase();
     return db.data.settings;
   };
 
   const update = async (options) => {
-    const db = await database;
+    const db = await getDatabase();
 
     await db.update((data) => {
       Object.apply(data.settings, options);

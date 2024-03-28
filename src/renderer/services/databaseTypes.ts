@@ -23,7 +23,7 @@ export type DBCollectionT = {
   id: string;
   name: string;
   description: string;
-  assetIds: number[];
+  assetIds: string[];
   createdDate: number;
   updatedDate: number;
   artworkUrl: string;
@@ -35,8 +35,8 @@ export type DBAssetT = {
   size: number;
   lengthSeconds: number;
   path: string;
-  type: 'audio' | 'midi';
-  subType: 'mp3' | 'wav';
+  type: "audio" | "midi";
+  subType: "mp3" | "wav";
   indexedDate: number;
   tags: string[];
   isFavorited: true;

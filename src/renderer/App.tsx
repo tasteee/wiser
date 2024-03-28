@@ -6,6 +6,7 @@ import { SettingsProvider } from './contexts/settings';
 import { Settings } from './views/Settings';
 import { Theme } from '@radix-ui/themes';
 import { Search } from './views/Search';
+import { SocketPovider } from './contexts/socket';
 
 const RouterHandler = () => {
   return (
@@ -24,9 +25,11 @@ export const App = () => {
     <Theme appearance="dark">
       <SettingsProvider>
         <SearchProvider>
-          <AppFrame>
-            <RouterHandler />
-          </AppFrame>
+          <SocketPovider>
+            <AppFrame>
+              <RouterHandler />
+            </AppFrame>
+          </SocketPovider>
         </SearchProvider>
       </SettingsProvider>
     </Theme>

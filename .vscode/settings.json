@@ -4,7 +4,14 @@
     ".prettierrc": "jsonc",
     ".eslintignore": "ignore"
   },
-  
+
+  "prettier.printWidth": 110,
+  "prettier.arrowParens": "always",
+  "prettier.trailingComma": "all",
+  "prettier.useTabs": false,
+  "prettier.tabWidth": 2,
+  "prettier.semi": false,
+
   "eslint.validate": [
     "javascript",
     "javascriptreact",

@@ -1,14 +1,14 @@
-import fs from 'fs'
-import path from 'path'
-import { getAudioDurationInSeconds } from 'get-audio-duration'
-import { checkIfAssetIsIndexed, addAsset } from './database.js'
+import fs from "fs"
+import path from "path"
+import { getAudioDurationInSeconds } from "get-audio-duration"
+import { checkIfAssetIsIndexed, addAsset } from "./database.mjs"
 
 const fsAsync = fs.promises
 
-const ASSET_FILE_EXTENSIONS = ['.midi', '.mid', '.mp3', '.wav']
-const AUDIO_FILE_EXTENSDIONS = ['.mp3', '.wav']
-const MIDI_FILE_EXTENSDIONS = ['.midi', '.mid']
-const IMAGE_FILE_EXTENSIONS = ['.j[g', '.jpeg', '.png']
+const ASSET_FILE_EXTENSIONS = [".midi", ".mid", ".mp3", ".wav"]
+const AUDIO_FILE_EXTENSDIONS = [".mp3", ".wav"]
+const MIDI_FILE_EXTENSDIONS = [".midi", ".mid"]
+const IMAGE_FILE_EXTENSIONS = [".j[g", ".jpeg", ".png"]
 
 const checkIfFileIsAsset = (filePath) => {
   const fileExtension = path.extname(filePath).toLowerCase()
@@ -27,7 +27,7 @@ const getFileSize = async (filePath) => {
     const fileSizeInKilobytes = fileSizeInBytes / 1024
     return fileSizeInKilobytes
   } catch (err) {
-    console.error('Error @ getFileSize: ', err)
+    console.error("Error @ getFileSize: ", err)
   }
 }
 
@@ -42,7 +42,7 @@ const getFolderAssetsList = async (folderPath) => {
   const assets = []
 
   for (const item of currentFolderItems) {
-    const itemPath = path.join(folderPath, item.name)
+    const itemPath = path.join(folderPath, item.name).replace(/(\\)(\\)/g, "/")
     const isItemFolder = item.isDirectory()
 
     if (isItemFolder) {
@@ -77,7 +77,7 @@ const buildAsset = async (assetPath, assetName, folderId) => {
   const fileExtension = path.extname(assetPath).toLowerCase()
   const isAudio = AUDIO_FILE_EXTENSDIONS.includes(fileExtension)
   const isMidi = MIDI_FILE_EXTENSDIONS.includes(fileExtension)
-  const type = (isAudio && 'audio') || (isMidi && 'midi') || 'ERROROROR'
+  const type = (isAudio && "audio") || (isMidi && "midi") || "ERROROROR"
 
   return {
     type,
@@ -98,34 +98,48 @@ const buildAsset = async (assetPath, assetName, folderId) => {
 // skip that file. If it hasn't, then it will continue
 // to gather necessary data about the asset and then
 // save the data in the database.
-const performFolderIndex = async (folder) => {
-  console.log('\n\n------------------------\n')
-  const [assets, imagePaths] = await getFolderAssetsList(folder.path)
+export const performFolderIndex = async (folder) => {
+  const [assets, imagePaths] = await getFolderAssetsList(folder.localPath)
   const finalAssets = []
 
-  const handleAssetIndexing = async ({ assetPath, assetName }) => {
-    const isAssetIndexed = await checkIfAssetIsIndexed(assetPath)
-    console.log(`\n${assetName}: indexed (${isAssetIndexed})`)
+  const assetStats = {
+    midiFileCount: 0,
+    audioFileCount: 0,
+    assetCount: assets.length,
+  }
 
-    if (isAssetIndexed) return
+  const tallyAssetStats = (asset) => {
+    if (asset.type === "audio") assetStats.audioFileCount++
+    if (asset.type === "midi") assetStats.midiFileCount++
+  }
+
+  const handleAssetIndexing = async ({ assetPath, assetName }) => {
+    const foundAsset = await checkIfAssetIsIndexed(assetPath)
+    const didFindAsset = !!foundAsset
+
+    console.log("did find asset?", didFindAsset, foundAsset?.id)
+
+    if (didFindAsset) {
+      tallyAssetStats(foundAsset)
+      return
+    }
+
     const asset = await buildAsset(assetPath, assetName, folder.id)
+    tallyAssetStats(asset)
     finalAssets.push(asset)
   }
 
   const promises = assets.map(handleAssetIndexing)
   await Promise.all(promises)
-  console.log(`\nAdding ${finalAssets.length} assets to database\n`)
 
   for (const finalAsset of finalAssets) {
-    console.log(`Adding ${finalAsset.name}.`)
     await addAsset(finalAsset)
-    console.log(`${finalAsset.name} added.\n`)
   }
 
-  console.log('\n------------------------\n')
+  return assetStats
 }
 
-performFolderIndex({
-  path: 'C:/Users/hannah/Music/Asset Packs/POP_PIANO/FLPP_WAV_LOOPS/FLPP_120/xxx',
-  id: 9090909,
-})
+// performFolderIndex({
+//   path: 'C:/Users/hannah/Music/Asset Packs/POP_PIANO/FLPP_WAV_LOOPS/FLPP_120/xxx',
+//   id: 9090909,
+// });

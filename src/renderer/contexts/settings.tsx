@@ -8,21 +8,23 @@ type FolderListT = Array<PartialOrFullFolderT>;
 
 type SettingsContextT = {
   settings: DBSettingsT | undefined;
-  folders: FolderListT;
+  folders: DBFolderT[] | undefined;
   addFolder: (folder: PartialFolderT) => void;
   removeFolder: (folder: DBFolderT) => void;
+  setFolders: React.Dispatch<React.SetStateAction<DBFolderT[] | undefined>>;
 };
 
 const contextCreator = (): SettingsContextT => {
   const [settings, setSettings] = React.useState<DBSettingsT | undefined>();
-  const [folders, setFolders] = React.useState<FolderListT>([]);
+  const [folders, setFolders] = React.useState<DBFolderT[] | undefined>();
 
   React.useEffect(() => {
     try {
+      services.startup();
       services.settings.get().json(setSettings);
       services.folders.get().json(setFolders);
     } catch (error) {
-      console.log('Error at settings.get or folders.get', error);
+      console.log('Error at settngs context', error);
     }
   }, []);
 
@@ -30,7 +32,7 @@ const contextCreator = (): SettingsContextT => {
     try {
       const response = await services.folders.add(folder);
       const updatedFolders = await response.json();
-      setFolders(updatedFolders as DBFolderT[]);
+      setFolders([...(updatedFolders as DBFolderT[])]);
     } catch (error) {
       console.log({ ERROR: error });
     }
@@ -48,9 +50,10 @@ const contextCreator = (): SettingsContextT => {
 
   return {
     settings,
-    folders,
+    folders: folders || [],
     addFolder,
     removeFolder,
+    setFolders,
   };
 };
 
